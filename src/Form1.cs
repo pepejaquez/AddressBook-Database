@@ -44,12 +44,31 @@ namespace Address_Book
 			con = new SqliteConnection(DatabaseConnectionString);
 			con.Open();
 			
+			SqliteCommand sqlCreate = new SqliteCommand(@"CREATE TABLE addressentries (
+				first_name varchar(30), 
+				last_name varchar(30), 
+				address varchar(30), 
+				city varchar(30), 
+				state varchar(30), 
+				zipcode varchar(30), 
+				home_phone varchar(30), 
+				cell_phone varchar(30), 
+				email varchar(30), 
+				comment varchar(30)
+			);", con);
+			try {
+				sqlCreate.ExecuteNonQuery();
+			} catch (Exception e) {
+				if (!e.Message.Contains("already exists")) {
+					throw new Exception("our database is not in a state we expected");
+				}
+			}
+
 			string sql = "SELECT * FROM addressentries ORDER BY last_name ASC";
 
 			SqliteCommand cmd = new SqliteCommand(sql, con);
 			SqliteDataReader dr = cmd.ExecuteReader();
 			
-
 			while (dr.Read())
 			{
 				AddressEntry addressEntry = new AddressEntry();
