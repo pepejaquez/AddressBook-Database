@@ -33,7 +33,7 @@ namespace Build
 
         public override String ToString()
         {
-              return $"{this.Id}@{this.Version}";
+            return $"{this.Id}@{this.Version}";
         }
     }
 
@@ -97,25 +97,7 @@ namespace Build
             Console.WriteLine($"Unpackaging Dependency {dependency} into {dependency.CommonName()}");
             try
             {
-                using (Process myProcess = new Process())
-                {
-                    myProcess.StartInfo.UseShellExecute = false;
-                    myProcess.StartInfo.FileName = $"tar";
-                    myProcess.StartInfo.Arguments = $"-xf {dependency.LocalNuPkgURI()} --directory={dependency.LocalNuPkgDir()}";
-                    myProcess.StartInfo.CreateNoWindow = true;
-                    myProcess.StartInfo.RedirectStandardOutput = true;
-                    myProcess.StartInfo.RedirectStandardError = true;
-
-                    myProcess.Start();
-                    var output = myProcess.StandardOutput.ReadToEnd();
-                    var error = myProcess.StandardError.ReadToEnd();
-                    Console.WriteLine(output);
-                    myProcess.WaitForExit();
-
-                    if (myProcess.ExitCode != 0) {
-                        Console.WriteLine($"Unpackaging Package {dependency} Failed: {error}");
-                    }
-                }
+                Build.ExecuteProcess("tar", $"-xf {dependency.LocalNuPkgURI()} --directory={dependency.LocalNuPkgDir()}");
             }
             catch (Exception e)
             {
@@ -128,38 +110,21 @@ namespace Build
             Console.WriteLine($"Compiling Project with Dependencies {string.Join(", ", Dependencies)}");
             try
             {
-                using (Process myProcess = new Process())
+                var dllDirectoryList = new List<string>();
+                foreach (Dependency dependency in Dependencies)
                 {
-                    myProcess.StartInfo.UseShellExecute = false;
-                    myProcess.StartInfo.FileName = $"csc";
-                    var dllDirectoryList = new List<string>();
-                    foreach (Dependency dependency in Dependencies)
+                    string[] fileEntries = Directory.GetFiles(dependency.LocalNuPkgDLLDir(Build.DefaultTarget));
+                    foreach (string fileName in fileEntries)
                     {
-                        string[] fileEntries = Directory.GetFiles(dependency.LocalNuPkgDLLDir(Build.DefaultTarget));
-                        foreach (string fileName in fileEntries)
-                        {
-                            dllDirectoryList.Add(fileName);
-                        }
-                    }
-                    myProcess.StartInfo.Arguments = $"-r:{String.Join(",", dllDirectoryList.ToArray())} -out:bin/{Build.DefaultExecutable} -lib:{Build.SystemDLLLocationTemplate} src/*.cs";
-                    myProcess.StartInfo.CreateNoWindow = true;
-                    myProcess.StartInfo.RedirectStandardOutput = true;
-                    myProcess.StartInfo.RedirectStandardError = true;
-
-                    myProcess.Start();
-                    var output = myProcess.StandardOutput.ReadToEnd();
-                    var error = myProcess.StandardError.ReadToEnd();
-                    Console.WriteLine(output);
-                    myProcess.WaitForExit();
-
-                    if (myProcess.ExitCode != 0) {
-                        Console.WriteLine($"Compiling Project with Dependencies {string.Join(", ", Dependencies)} Failed: {error}");
+                        dllDirectoryList.Add(fileName);
                     }
                 }
+                
+                Build.ExecuteProcess("csc", $"-r:{String.Join(",", dllDirectoryList.ToArray())} -out:bin/{Build.DefaultExecutable} -lib:{Build.SystemDLLLocationTemplate} src/*.cs");
             }
-            catch (Exception e)
+            catch (Exception error)
             {
-                Console.WriteLine($"Compiling Project Failed: {e}");
+                Console.WriteLine($"Compiling Project with Dependencies {string.Join(", ", Dependencies)} Failed: {error}");
             }
         }
 
@@ -172,6 +137,28 @@ namespace Build
                 foreach (string fileName in fileEntries)
                 {
                     File.Copy(fileName, $"{Build.LocalBinDir}/{Path.GetFileName(fileName)}", true);
+                }
+            }
+        }
+
+        static void ExecuteProcess(string executable, string arguments) {
+            using (Process myProcess = new Process())
+            {
+                myProcess.StartInfo.UseShellExecute = false;
+                myProcess.StartInfo.FileName = $"{executable}";
+                myProcess.StartInfo.Arguments = $"{arguments}";
+                myProcess.StartInfo.CreateNoWindow = true;
+                myProcess.StartInfo.RedirectStandardOutput = true;
+                myProcess.StartInfo.RedirectStandardError = true;
+
+                myProcess.Start();
+                var output = myProcess.StandardOutput.ReadToEnd();
+                var error = myProcess.StandardError.ReadToEnd();
+                Console.WriteLine(output);
+                myProcess.WaitForExit();
+
+                if (myProcess.ExitCode != 0) {
+                    throw new Exception(error);
                 }
             }
         }
