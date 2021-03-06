@@ -171,7 +171,7 @@ namespace Build
                 string[] fileEntries = Directory.GetFiles(dependency.LocalNuPkgDLLDir(Build.DefaultTarget));
                 foreach (string fileName in fileEntries)
                 {
-                    File.Copy(fileName, $"bin/{Path.GetFileName(fileName)}", true);
+                    File.Copy(fileName, $"{Build.LocalBinDir}/{Path.GetFileName(fileName)}", true);
                 }
             }
         }
