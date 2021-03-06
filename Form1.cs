@@ -79,7 +79,7 @@ namespace Address_Book
 			string str = lstboxCurrentContacts.SelectedItem.ToString();
 
 			// Use the firstName and lastName from the listbox entries to find and display the correct address information for the entry.
-			string firstName = str.Substring(str.IndexOf(' '), str.Length - str.IndexOf(' ') - 1);
+			string firstName = str.Substring(str.IndexOf(' ') + 1, str.Length - str.IndexOf(' ') - 1);
 			string lastName = str.Substring(0, str.IndexOf(','));
 
 
@@ -97,6 +97,8 @@ namespace Address_Book
 					maskedtxtboxCellPhone.Text = addressEntry.CellPhone;
 					txtboxEmail.Text = addressEntry.Email;
 					txtboxComment.Text = addressEntry.Comment;
+
+					break;
                 }
             }
         }
