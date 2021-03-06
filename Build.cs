@@ -106,6 +106,7 @@ namespace Build
                 Console.WriteLine(e.Message);
             }
         }
+        
         static void CompileProject(List<Dependency> Dependencies)
         {
             try
@@ -149,7 +150,4 @@ namespace Build
             }
         }
     }
-
-
-
 }
