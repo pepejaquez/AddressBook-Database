@@ -20,14 +20,15 @@ namespace Build
         public string Id { set; get; }
         public string Version { set; get; }
 
-        public string NuPkgURI() => $"https://api.nuget.org/v3-flatcontainer/{this.Id.ToLowerInvariant()}/{this.Version.ToLowerInvariant()}/{this.Id.ToLowerInvariant()}.{this.Version.ToLowerInvariant()}.nupkg";
-        public string LocalNuPkgURI() => $"nuget-packages/{this.Id.ToLowerInvariant()}.{this.Version.ToLowerInvariant()}.nupkg";
-        public string LocalNuPkgDir() => $"nuget-packages/{this.Id.ToLowerInvariant()}.{this.Version.ToLowerInvariant()}";
-
+        public string CommonName() => $"{this.Id.ToLowerInvariant()}.{this.Version.ToLowerInvariant()}";
+        public string NuPkgFileName() => $"{this.CommonName()}.nupkg";
+        public string RemoteNuPkgURI() => $"https://api.nuget.org/v3-flatcontainer/{this.Id.ToLowerInvariant()}/{this.Version.ToLowerInvariant()}/{this.NuPkgFileName()}";
+        public string LocalNuPkgURI() => $"{Build.LocalSharedNuPkgDir}/{this.NuPkgFileName()}";
+        public string LocalNuPkgDir() =>  $"{Build.LocalSharedNuPkgDir}/{this.CommonName()}";
         public string LocalNuPkgDLLDir(DotNetTargets target)
         {
             var netTarget = (int)target;
-            return $"nuget-packages/{this.Id.ToLowerInvariant()}.{this.Version.ToLowerInvariant()}/lib/net{netTarget}/";
+            return $"{this.LocalNuPkgDir()}/lib/net{netTarget}/";
         }
 
         public override String ToString()
@@ -38,7 +39,9 @@ namespace Build
 
     static class Build
     {
-        public static readonly DotNetTargets DefaultTarget = DotNetTargets.FortyFive;
+        public static readonly string LocalSharedNuPkgDir = "nuget-packages";
+        public static readonly string LocalBinDir = "bin";
+        static readonly DotNetTargets DefaultTarget = DotNetTargets.FortyFive;
         static readonly HttpClient client = new HttpClient();
 
         static readonly string SystemDLLLocationTemplate = "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319";
@@ -46,49 +49,52 @@ namespace Build
 
         static void Main()
         {
-            // See: https://stackoverflow.com/questions/22251689/make-https-call-using-httpclient
-            System.Net.ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
-
-            Directory.CreateDirectory("nuget-packages");
-
             var Dependencies = new List<Dependency>();
             Dependencies.Add(new Dependency { Id = "Community.CsharpSqlite.SQLiteClient", Version = "3.7.7.3" });
 
+            // See: https://stackoverflow.com/questions/22251689/make-https-call-using-httpclient
+            System.Net.ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
+                
+            Console.WriteLine($"Creating Directory {Build.LocalSharedNuPkgDir} to Store Dependencies {string.Join(", ", Dependencies)}");
+            Directory.CreateDirectory(Build.LocalSharedNuPkgDir);
+
             foreach (Dependency dependency in Dependencies)
             {
-                Console.WriteLine($"Downloading Dependency {dependency}");
                 var task = Build.DownloadPackage(dependency);
                 task.Wait();
+                Console.WriteLine($"Creating Directory {dependency.LocalNuPkgDir()} to Unpackage Dependency {dependency}");
                 Directory.CreateDirectory(dependency.LocalNuPkgDir());
                 Build.Unpkg(dependency);
             }
 
-            Directory.CreateDirectory("bin");
+            Console.WriteLine($"Creating Directory {Build.LocalBinDir} to Store DLLs and Project Binaries");
+            Directory.CreateDirectory(Build.LocalBinDir);
             Build.CompileProject(Dependencies);
             Build.PrepareDLLsForProject(Dependencies);
         }
 
         static async Task DownloadPackage(Dependency dependency)
         {
+            Console.WriteLine($"Downloading Dependency {dependency}");
             try
             {
-                Console.WriteLine($"Contacting nuget registry at {dependency.NuPkgURI()}...");
-                Stream responseBody = await client.GetStreamAsync(dependency.NuPkgURI());
-                Console.WriteLine(responseBody);
+                Console.WriteLine($"Contacting nuget registry at {dependency.RemoteNuPkgURI()}...");
+                Stream responseBody = await client.GetStreamAsync(dependency.RemoteNuPkgURI());
 
                 using (FileStream DestinationStream = File.Create(dependency.LocalNuPkgURI()))
                 {
                     await responseBody.CopyToAsync(DestinationStream);
                 }
             }
-            catch (HttpRequestException e)
+            catch (Exception e)
             {
-                Console.WriteLine($"Message: {e}");
+                Console.WriteLine($"Dowloading Package {dependency} Failed: {e}");
             }
         }
 
         static void Unpkg(Dependency dependency)
         {
+            Console.WriteLine($"Unpackaging Dependency {dependency} into {dependency.CommonName()}");
             try
             {
                 using (Process myProcess = new Process())
@@ -97,18 +103,29 @@ namespace Build
                     myProcess.StartInfo.FileName = $"tar";
                     myProcess.StartInfo.Arguments = $"-xf {dependency.LocalNuPkgURI()} --directory={dependency.LocalNuPkgDir()}";
                     myProcess.StartInfo.CreateNoWindow = true;
+                    myProcess.StartInfo.RedirectStandardOutput = true;
+                    myProcess.StartInfo.RedirectStandardError = true;
+
                     myProcess.Start();
+                    var output = myProcess.StandardOutput.ReadToEnd();
+                    var error = myProcess.StandardError.ReadToEnd();
+                    Console.WriteLine(output);
                     myProcess.WaitForExit();
+
+                    if (myProcess.ExitCode != 0) {
+                        Console.WriteLine($"Unpackaging Package {dependency} Failed: {error}");
+                    }
                 }
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
+                Console.WriteLine($"Unpackaging Package {dependency} Failed: {e}");
             }
         }
         
         static void CompileProject(List<Dependency> Dependencies)
         {
+            Console.WriteLine($"Compiling Project with Dependencies {string.Join(", ", Dependencies)}");
             try
             {
                 using (Process myProcess = new Process())
@@ -127,19 +144,28 @@ namespace Build
                     myProcess.StartInfo.Arguments = $"-r:{String.Join(",", dllDirectoryList.ToArray())} -out:bin/{Build.DefaultExecutable} -lib:{Build.SystemDLLLocationTemplate} src/*.cs";
                     myProcess.StartInfo.CreateNoWindow = true;
                     myProcess.StartInfo.RedirectStandardOutput = true;
+                    myProcess.StartInfo.RedirectStandardError = true;
+
                     myProcess.Start();
-                    Console.WriteLine(myProcess.StandardOutput.ReadToEnd());
+                    var output = myProcess.StandardOutput.ReadToEnd();
+                    var error = myProcess.StandardError.ReadToEnd();
+                    Console.WriteLine(output);
                     myProcess.WaitForExit();
+
+                    if (myProcess.ExitCode != 0) {
+                        Console.WriteLine($"Compiling Project with Dependencies {string.Join(", ", Dependencies)} Failed: {error}");
+                    }
                 }
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
+                Console.WriteLine($"Compiling Project Failed: {e}");
             }
         }
 
         static void PrepareDLLsForProject(List<Dependency> Dependencies)
         {
+            Console.WriteLine($"Preparing DLLs for Project Execution for Dependencies {string.Join(", ", Dependencies)}");
             foreach (Dependency dependency in Dependencies)
             {
                 string[] fileEntries = Directory.GetFiles(dependency.LocalNuPkgDLLDir(Build.DefaultTarget));

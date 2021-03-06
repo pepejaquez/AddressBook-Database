@@ -104,7 +104,7 @@ namespace Address_Book
 
             foreach (AddressEntry addressEntry in addressEntries)
             {
-				if (addressEntry.FirstName.Equals(firstName) && addressEntry.LastName.Equals(lastName));
+				if (addressEntry.FirstName.Equals(firstName) && addressEntry.LastName.Equals(lastName))
                 {
 					txtboxFirstName.Text = addressEntry.FirstName;
 					txtboxLastName.Text = addressEntry.LastName;

@@ -17,4 +17,4 @@ defines the build process (unique to our project; not broadly applicable to .NET
 execute `build.bat` on CMD prompt
 
 ## Execute after build
-execute `bin\MyExecutable.exe`
+execute `bin\AddressBook.exe`
