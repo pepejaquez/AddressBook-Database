@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Community.CsharpSqlite.SQLiteClient;
+using Alba.CsConsoleFormat.Fluent;
 
 namespace Address_Book
 {
@@ -21,9 +22,9 @@ namespace Address_Book
 		/// </summary>
 		List<AddressEntry> addressEntries = new List<AddressEntry>();	
 
-
 		public Form1()
         {
+			Colors.WriteLine("Initializing Form for Address Book...".Yellow());
             InitializeComponent();
         }
 
@@ -41,6 +42,7 @@ namespace Address_Book
 
 		public void DatabaseConnect()
 		{
+			Colors.WriteLine($"Connecting to Database @ {DatabaseConnectionString} for Address Book...".Yellow());
 			con = new SqliteConnection(DatabaseConnectionString);
 			con.Open();
 			
@@ -57,10 +59,14 @@ namespace Address_Book
 				comment varchar(30)
 			);", con);
 			try {
+				Colors.WriteLine($"Migrating Database @ {DatabaseConnectionString} for Address Book's addressentries...".Yellow());
 				sqlCreate.ExecuteNonQuery();
+				Colors.WriteLine($"Migrating Database @ {DatabaseConnectionString} for Address Book's addressentries was Successful".Green());
 			} catch (Exception e) {
 				if (!e.Message.Contains("already exists")) {
 					throw new Exception("our database is not in a state we expected");
+				} else {
+					Colors.WriteLine($"Migrating Database @ {DatabaseConnectionString} for Address Book's addressentries was Already Completed".Green());
 				}
 			}
 
@@ -68,7 +74,7 @@ namespace Address_Book
 
 			SqliteCommand cmd = new SqliteCommand(sql, con);
 			SqliteDataReader dr = cmd.ExecuteReader();
-			
+			Colors.WriteLine($"Reading entries from database @ {DatabaseConnectionString} for Address Book's addressentries...".Yellow());
 			while (dr.Read())
 			{
 				AddressEntry addressEntry = new AddressEntry();
@@ -133,7 +139,7 @@ namespace Address_Book
 				using (con = new SqliteConnection(DatabaseConnectionString))
                 {
 					SqliteCommand sqlInsert = new SqliteCommand("INSERT INTO addressentries (first_name, last_name, address, city, state, zipcode, home_phone, cell_phone, email, comment) VALUES(@first_name, @last_name, @address, @city, @state, @zipcode, @home_phone, @cell_phone, @email, @comment)", con);
-
+					Colors.WriteLine($"Inserting entry into database @ {DatabaseConnectionString} for Address Book's addressentries...".Yellow());	
 					sqlInsert.Parameters.Add("@first_name", txtboxFirstName.Text);
 					sqlInsert.Parameters.Add("@last_name", txtboxLastName.Text);
 					sqlInsert.Parameters.Add("@address", txtboxAddress.Text);

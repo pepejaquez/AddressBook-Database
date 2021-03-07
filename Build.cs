@@ -13,22 +13,24 @@ namespace Build
     enum DotNetTargets
     {
         FortyFive = 45,
+        Forty = 40
     }
 
     class Dependency
     {
         public string Id { set; get; }
         public string Version { set; get; }
+        public DotNetTargets Target { set; get; }
 
         public string CommonName() => $"{this.Id.ToLowerInvariant()}.{this.Version.ToLowerInvariant()}";
         public string NuPkgFileName() => $"{this.CommonName()}.nupkg";
         public string RemoteNuPkgURI() => $"https://api.nuget.org/v3-flatcontainer/{this.Id.ToLowerInvariant()}/{this.Version.ToLowerInvariant()}/{this.NuPkgFileName()}";
         public string LocalNuPkgURI() => $"{Build.LocalSharedNuPkgDir}/{this.NuPkgFileName()}";
         public string LocalNuPkgDir() =>  $"{Build.LocalSharedNuPkgDir}/{this.CommonName()}";
-        public string LocalNuPkgDLLDir(DotNetTargets target)
+        public string LocalNuPkgDLLDir()
         {
-            var netTarget = (int)target;
-            return $"{this.LocalNuPkgDir()}/lib/net{netTarget}/";
+            var target = (int)this.Target;
+            return $"{this.LocalNuPkgDir()}/lib/net{target}/";
         }
 
         public override String ToString()
@@ -41,16 +43,16 @@ namespace Build
     {
         public static readonly string LocalSharedNuPkgDir = "nuget-packages";
         public static readonly string LocalBinDir = "bin";
-        static readonly DotNetTargets DefaultTarget = DotNetTargets.FortyFive;
         static readonly HttpClient client = new HttpClient();
 
-        static readonly string SystemDLLLocationTemplate = "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319";
+        static readonly string SystemDLLsLocation = "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319";
         static readonly string DefaultExecutable = "AddressBook.exe";
 
         static void Main()
         {
             var Dependencies = new List<Dependency>();
-            Dependencies.Add(new Dependency { Id = "Community.CsharpSqlite.SQLiteClient", Version = "3.7.7.3" });
+            Dependencies.Add(new Dependency { Id = "Community.CsharpSqlite.SQLiteClient", Version = "3.7.7.3", Target = DotNetTargets.FortyFive });
+            Dependencies.Add(new Dependency { Id = "Alba.CsConsoleFormat", Version = "1.0.0", Target = DotNetTargets.Forty });
 
             // See: https://stackoverflow.com/questions/22251689/make-https-call-using-httpclient
             System.Net.ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
@@ -113,14 +115,14 @@ namespace Build
                 var dllDirectoryList = new List<string>();
                 foreach (Dependency dependency in Dependencies)
                 {
-                    string[] fileEntries = Directory.GetFiles(dependency.LocalNuPkgDLLDir(Build.DefaultTarget));
+                    string[] fileEntries = Directory.GetFiles(dependency.LocalNuPkgDLLDir());
                     foreach (string fileName in fileEntries)
                     {
                         dllDirectoryList.Add(fileName);
                     }
                 }
                 
-                Build.ExecuteProcess("csc", $"-r:{String.Join(",", dllDirectoryList.ToArray())} -out:bin/{Build.DefaultExecutable} -lib:{Build.SystemDLLLocationTemplate} src/*.cs");
+                Build.ExecuteProcess("csc", $"-r:{String.Join(",", dllDirectoryList.ToArray())} -out:bin/{Build.DefaultExecutable} -lib:{Build.SystemDLLsLocation} src/*.cs");
             }
             catch (Exception error)
             {
@@ -133,7 +135,7 @@ namespace Build
             Console.WriteLine($"Preparing DLLs for Project Execution for Dependencies {string.Join(", ", Dependencies)}");
             foreach (Dependency dependency in Dependencies)
             {
-                string[] fileEntries = Directory.GetFiles(dependency.LocalNuPkgDLLDir(Build.DefaultTarget));
+                string[] fileEntries = Directory.GetFiles(dependency.LocalNuPkgDLLDir());
                 foreach (string fileName in fileEntries)
                 {
                     File.Copy(fileName, $"{Build.LocalBinDir}/{Path.GetFileName(fileName)}", true);
@@ -145,8 +147,8 @@ namespace Build
             using (Process myProcess = new Process())
             {
                 myProcess.StartInfo.UseShellExecute = false;
-                myProcess.StartInfo.FileName = $"{executable}";
-                myProcess.StartInfo.Arguments = $"{arguments}";
+                myProcess.StartInfo.FileName = executable;
+                myProcess.StartInfo.Arguments = arguments;
                 myProcess.StartInfo.CreateNoWindow = true;
                 myProcess.StartInfo.RedirectStandardOutput = true;
                 myProcess.StartInfo.RedirectStandardError = true;
