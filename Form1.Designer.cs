@@ -51,7 +51,8 @@ namespace Address_Book
             this.maskedtxtboxCellPhone = new System.Windows.Forms.MaskedTextBox();
             this.lstboxCurrentContacts = new System.Windows.Forms.ListBox();
             this.lblCurrentContacts = new System.Windows.Forms.Label();
-            this.btnNewUpdateEntry = new System.Windows.Forms.Button();
+            this.btnAddNewEntry = new System.Windows.Forms.Button();
+            this.btnUpdateEntry = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // txtboxFirstName
@@ -225,7 +226,7 @@ namespace Address_Book
             this.lstboxCurrentContacts.Name = "lstboxCurrentContacts";
             this.lstboxCurrentContacts.Size = new System.Drawing.Size(208, 424);
             this.lstboxCurrentContacts.TabIndex = 22;
-            this.lstboxCurrentContacts.DoubleClick += new System.EventHandler(this.lstboxCurrentContacts_DoubleClick);
+            this.lstboxCurrentContacts.SelectedIndexChanged += new System.EventHandler(this.lstboxCurrentContacts_SelectedIndexChanged);
             // 
             // lblCurrentContacts
             // 
@@ -236,22 +237,33 @@ namespace Address_Book
             this.lblCurrentContacts.TabIndex = 23;
             this.lblCurrentContacts.Text = "Current Contacts";
             // 
-            // btnNewUpdateEntry
+            // btnAddNewEntry
             // 
-            this.btnNewUpdateEntry.Location = new System.Drawing.Point(343, 486);
-            this.btnNewUpdateEntry.Name = "btnNewUpdateEntry";
-            this.btnNewUpdateEntry.Size = new System.Drawing.Size(222, 47);
-            this.btnNewUpdateEntry.TabIndex = 24;
-            this.btnNewUpdateEntry.Text = "New/Update Entry";
-            this.btnNewUpdateEntry.UseVisualStyleBackColor = true;
-            this.btnNewUpdateEntry.Click += new System.EventHandler(this.btnNewUpdateEntry_Click);
+            this.btnAddNewEntry.Location = new System.Drawing.Point(90, 479);
+            this.btnAddNewEntry.Name = "btnAddNewEntry";
+            this.btnAddNewEntry.Size = new System.Drawing.Size(222, 47);
+            this.btnAddNewEntry.TabIndex = 24;
+            this.btnAddNewEntry.Text = "Add New Entry";
+            this.btnAddNewEntry.UseVisualStyleBackColor = true;
+            this.btnAddNewEntry.Click += new System.EventHandler(this.btnAddNewEntry_Click);
+            // 
+            // btnUpdateEntry
+            // 
+            this.btnUpdateEntry.Location = new System.Drawing.Point(359, 479);
+            this.btnUpdateEntry.Name = "btnUpdateEntry";
+            this.btnUpdateEntry.Size = new System.Drawing.Size(222, 47);
+            this.btnUpdateEntry.TabIndex = 25;
+            this.btnUpdateEntry.Text = "Update Entry";
+            this.btnUpdateEntry.UseVisualStyleBackColor = true;
+            this.btnUpdateEntry.Click += new System.EventHandler(this.btnUpdateEntry_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(735, 551);
-            this.Controls.Add(this.btnNewUpdateEntry);
+            this.Controls.Add(this.btnUpdateEntry);
+            this.Controls.Add(this.btnAddNewEntry);
             this.Controls.Add(this.lblCurrentContacts);
             this.Controls.Add(this.lstboxCurrentContacts);
             this.Controls.Add(this.maskedtxtboxCellPhone);
@@ -308,7 +320,8 @@ namespace Address_Book
         private System.Windows.Forms.MaskedTextBox maskedtxtboxCellPhone;
         private System.Windows.Forms.ListBox lstboxCurrentContacts;
         private System.Windows.Forms.Label lblCurrentContacts;
-        private System.Windows.Forms.Button btnNewUpdateEntry;
+        private System.Windows.Forms.Button btnAddNewEntry;
+        private System.Windows.Forms.Button btnUpdateEntry;
     }
 }
 
