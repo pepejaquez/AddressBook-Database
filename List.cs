@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -30,6 +31,31 @@ namespace Address_Book
             int firstopen = items;
 
             // Check if the array is maxed out. If so create a new array doubling the size of the current array and copy the contents to the new array.
+            ResizeList();
+
+            // Add the new item to the newly sized array.
+            myMemory[firstopen] = i;
+
+            // Track the current number of items in the array.
+            items++;
+        }
+
+
+        /// <summary>
+        /// Print the contents of the list.
+        /// </summary>
+        public void print()
+        {
+            for(int i = 0; i < items; i++)
+            {
+                {
+                    Console.WriteLine(myMemory[i]);
+                }
+            }
+        }
+
+        private void ResizeList()
+        {
             if (items == capacity)
             {
                 // Double the capacity for the array
@@ -51,26 +77,52 @@ namespace Address_Book
                 myMemory = tempMemory;
 
             }
-
-            // Add the new item to the newly sized array.
-            myMemory[firstopen] = i;
-
-            // Track the current number of items in the array.
-            items++;
         }
 
-
         /// <summary>
-        /// Print the contents of the list.
+        /// Removes the first occurance of 'item'.
         /// </summary>
-        public void print()
+        /// <param name="item"></param>
+        public void Remove(int item)
         {
+            // What if the entry to delete was a zero?
             for(int i = 0; i < items; i++)
             {
+                // If the item is found, set the index of the item to the default value of 0.
+                if(myMemory[i] == item)
                 {
-                    Console.WriteLine(myMemory[i]);
+                    myMemory[i] = 0;
+                    break;
                 }
             }
+        }
+
+        /// <summary>
+        /// Removes the item at the specified index.
+        /// </summary>
+        /// <param name="index">An integer that corresponds to the index.</param>
+        public void RemoveAt(int index)
+        {
+            myMemory[index] = 0;
+        }
+
+        public void Insert(int index, int item)
+        {
+            // Check if the array is maxed out. If so create a new array doubling the size of the current array and copy the contents to the new array.
+            ResizeList();
+
+            // Number of items to shift right to allow insert at the specified index.
+            int shiftRight = items - (index - 1);
+            int decrement = items;
+
+            //*** What if the insert is > # of items in the list? What to do? ***
+
+            for (int i = 0; i < shiftRight; i++, decrement--)
+            {
+                myMemory[decrement] = myMemory[decrement - 1];
+            }
+            myMemory[index - 1] = item;
+            items++;
         }
 
 
