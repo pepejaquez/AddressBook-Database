@@ -14,7 +14,8 @@ namespace Address_Book
 		/// <summary>
 		///  The AddressEntry type for the list is the class with basic address data fields.
 		/// </summary>
-		List<AddressEntry> addressEntries = new List<AddressEntry>();	
+		//List<AddressEntry> addressEntries = new List<AddressEntry>();	
+		List<string> addressEntries = new List<string>();
 
 
 		public Form1()
@@ -23,7 +24,9 @@ namespace Address_Book
         }
 
         private void Form1_Load(object sender, EventArgs e)
-        {			
+        {
+			//CreateSQLitemanTable();
+			//testList();
 			DatabaseConnect();
 		}
 
@@ -44,6 +47,8 @@ namespace Address_Book
 				while (dr.Read())
 				{
 					lstboxCurrentContacts.Items.Add(dr["last_name"].ToString() + ", " + dr["first_name"].ToString());
+					addressEntries.Add(dr["first_name"].ToString());
+
 				}
 			}
 		}
@@ -104,7 +109,7 @@ namespace Address_Book
 
         private void btnAddNewEntry_Click(object sender, EventArgs e)
         {
-            if (!string.IsNullOrEmpty(txtboxLastName.Text)) ;
+			if (!string.IsNullOrEmpty(txtboxLastName.Text)) 
             {
                 // Write new address to the database.
                 using (con = new SqliteConnection(DatabaseConnectionString))
@@ -142,6 +147,65 @@ namespace Address_Book
 				con.Open();
 				sqlUpdate.ExecuteNonQuery();
 			}
-		}		
-    }
+		}
+
+		//private void testList()
+  //      {
+		//	List tester = new List();
+
+  //          tester.Add(1);
+  //          tester.Add(2);
+  //          tester.Add(3);
+  //          tester.Add(4444);
+  //          tester.Add(5);
+  //          tester.Add(6);
+
+		//	tester.print();
+  //      }
+
+		//private void CreateSQLitemanTable()
+		//      {
+		//	string command = "CREATE DATABASE Address Book USE Address Book CREATE TABLE addressentries(" +
+		//					"id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
+		//                          "first_name varchar(30)," +
+		//					"last_name varchar(30)," +
+		//					"address varchar(30)," +
+		//					"city varchar(30)," +
+		//					"state varchar(30)," +
+		//					"zipcode varchar(30)," +
+		//					"home_phone varchar(30)," +
+		//					"cell_phone varchar(30)," +
+		//					"email varchar(30)," +
+		//					"comment varchar(30))";
+
+		//          try
+		//          {
+		//		using(con = new SqliteConnection(DatabaseConnectionString))
+		//              {
+		//			SqliteCommand cmd = new SqliteCommand(command, con);
+		//			con.Open();
+		//			cmd.ExecuteNonQuery();
+
+		//		}
+		//          }
+		//	catch(Exception ex)
+		//          {
+		//		MessageBox.Show(ex.ToString());
+		//              //CREATE TABLE "addressentries"(
+		//              //"id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+		//              //"first_name" TEXT NOT NULL,
+		//              //"last_name" TEXT NOT NULL,
+		//              //"address" TEXT,
+		//              //"city" TEXT,
+		//              //"state" TEXT,
+		//              //"zipcode" TEXT,
+		//              //"home_phone" TEXT,
+		//              //"cell_phone" TEXT,
+		//              //"email" TEXT,
+		//              //"comment" TEXT
+
+
+		//          }
+		//      }
+	}
 }
