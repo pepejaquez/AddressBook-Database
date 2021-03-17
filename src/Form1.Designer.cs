@@ -1,5 +1,4 @@
-﻿
-namespace Address_Book
+﻿namespace Address_Book
 {
     partial class Form1
     {

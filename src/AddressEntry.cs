@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Address_Book
+﻿namespace Address_Book
 {
 	/// <summary>
 	/// Used as a single address entry.

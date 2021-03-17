@@ -1,4 +1,3 @@
 Address Book.db
-Build.exe
 bin/
-nuget-packages/
+obj/
