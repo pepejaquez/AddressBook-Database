@@ -20,7 +20,25 @@ namespace Address_Book
         {
 
         }
-        
+
+        //static void Main()
+        //{
+
+        //    List tester = new List();
+
+        //    tester.Add(1);
+        //    tester.Add(2);
+        //    tester.Add(3);
+        //    tester.Add(4);
+        //    tester.Add(5);
+
+        //    tester.print();
+        //    Console.WriteLine();
+
+        //    tester.Insert(2, 3333);
+        //    tester.print();
+        //}
+
         /// <summary>
         /// The add method adds an item to the end of the array. If the array is full, the method will double the size of the array, copy the contents of the array to the tempMemory array, point the memory location to the newly sized array, and then adds the new item.
         /// </summary>
@@ -84,17 +102,20 @@ namespace Address_Book
         /// </summary>
         /// <param name="item"></param>
         public void Remove(int item)
-        {
-            // What if the entry to delete was a zero?
+        {            
             for(int i = 0; i < items; i++)
             {
-                // If the item is found, set the index of the item to the default value of 0.
+                // If the item is found, shift the remaining items to the left.
                 if(myMemory[i] == item)
                 {
-                    myMemory[i] = 0;
+                    for(int j = i; j < items - 1; j++)
+                    {
+                        myMemory[j] = myMemory[j + 1];
+                    }
+                    items--;
                     break;
                 }
-            }
+            }            
         }
 
         /// <summary>
@@ -106,22 +127,22 @@ namespace Address_Book
             myMemory[index] = 0;
         }
 
+
+        /// <summary>
+        /// Insert a new item at the specified index.
+        /// </summary>
+        /// <param name="index">The position in the list for the item to be inserted.</param>
+        /// <param name="item">The object to be inserted.</param>
         public void Insert(int index, int item)
         {
-            // Check if the array is maxed out. If so create a new array doubling the size of the current array and copy the contents to the new array.
-            ResizeList();
-
-            // Number of items to shift right to allow insert at the specified index.
-            int shiftRight = items - (index - 1);
-            int decrement = items;
-
-            //*** What if the insert is > # of items in the list? What to do? ***
-
-            for (int i = 0; i < shiftRight; i++, decrement--)
+            // Items is used to track how many items need to be shifted to the right to get to the insertion index.
+            for (int i = items; i >= index; i--)
             {
-                myMemory[decrement] = myMemory[decrement - 1];
+                // If the insertion index = 0  AND i = 0 bypass the for loop and insert the item.
+                if (!(i == 0 && index == 0))
+                    myMemory[i] = myMemory[i - 1];
             }
-            myMemory[index - 1] = item;
+            myMemory[index] = item;
             items++;
         }
 
