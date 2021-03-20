@@ -53,6 +53,7 @@ namespace Address_Book
             this.lblCurrentContacts = new System.Windows.Forms.Label();
             this.btnAddNewEntry = new System.Windows.Forms.Button();
             this.btnUpdateEntry = new System.Windows.Forms.Button();
+            this.btnClearAddress = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // txtboxFirstName
@@ -208,7 +209,7 @@ namespace Address_Book
             this.maskedtxtboxHomePhone.Mask = "(999) 000-0000";
             this.maskedtxtboxHomePhone.Name = "maskedtxtboxHomePhone";
             this.maskedtxtboxHomePhone.Size = new System.Drawing.Size(123, 26);
-            this.maskedtxtboxHomePhone.TabIndex = 20;
+            this.maskedtxtboxHomePhone.TabIndex = 6;
             // 
             // maskedtxtboxCellPhone
             // 
@@ -216,7 +217,7 @@ namespace Address_Book
             this.maskedtxtboxCellPhone.Mask = "(999) 000-0000";
             this.maskedtxtboxCellPhone.Name = "maskedtxtboxCellPhone";
             this.maskedtxtboxCellPhone.Size = new System.Drawing.Size(123, 26);
-            this.maskedtxtboxCellPhone.TabIndex = 21;
+            this.maskedtxtboxCellPhone.TabIndex = 7;
             // 
             // lstboxCurrentContacts
             // 
@@ -225,7 +226,7 @@ namespace Address_Book
             this.lstboxCurrentContacts.Location = new System.Drawing.Point(47, 38);
             this.lstboxCurrentContacts.Name = "lstboxCurrentContacts";
             this.lstboxCurrentContacts.Size = new System.Drawing.Size(208, 424);
-            this.lstboxCurrentContacts.TabIndex = 22;
+            this.lstboxCurrentContacts.TabIndex = 13;
             this.lstboxCurrentContacts.SelectedIndexChanged += new System.EventHandler(this.lstboxCurrentContacts_SelectedIndexChanged);
             // 
             // lblCurrentContacts
@@ -239,29 +240,40 @@ namespace Address_Book
             // 
             // btnAddNewEntry
             // 
-            this.btnAddNewEntry.Location = new System.Drawing.Point(90, 479);
+            this.btnAddNewEntry.Location = new System.Drawing.Point(255, 479);
             this.btnAddNewEntry.Name = "btnAddNewEntry";
             this.btnAddNewEntry.Size = new System.Drawing.Size(222, 47);
-            this.btnAddNewEntry.TabIndex = 24;
+            this.btnAddNewEntry.TabIndex = 11;
             this.btnAddNewEntry.Text = "Add New Entry";
             this.btnAddNewEntry.UseVisualStyleBackColor = true;
             this.btnAddNewEntry.Click += new System.EventHandler(this.btnAddNewEntry_Click);
             // 
             // btnUpdateEntry
             // 
-            this.btnUpdateEntry.Location = new System.Drawing.Point(359, 479);
+            this.btnUpdateEntry.Location = new System.Drawing.Point(497, 479);
             this.btnUpdateEntry.Name = "btnUpdateEntry";
             this.btnUpdateEntry.Size = new System.Drawing.Size(222, 47);
-            this.btnUpdateEntry.TabIndex = 25;
+            this.btnUpdateEntry.TabIndex = 12;
             this.btnUpdateEntry.Text = "Update Entry";
             this.btnUpdateEntry.UseVisualStyleBackColor = true;
             this.btnUpdateEntry.Click += new System.EventHandler(this.btnUpdateEntry_Click);
+            // 
+            // btnClearAddress
+            // 
+            this.btnClearAddress.Location = new System.Drawing.Point(12, 479);
+            this.btnClearAddress.Name = "btnClearAddress";
+            this.btnClearAddress.Size = new System.Drawing.Size(222, 47);
+            this.btnClearAddress.TabIndex = 10;
+            this.btnClearAddress.Text = "Clear Address";
+            this.btnClearAddress.UseVisualStyleBackColor = true;
+            this.btnClearAddress.Click += new System.EventHandler(this.btnClearAddress_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(735, 551);
+            this.Controls.Add(this.btnClearAddress);
             this.Controls.Add(this.btnUpdateEntry);
             this.Controls.Add(this.btnAddNewEntry);
             this.Controls.Add(this.lblCurrentContacts);
@@ -287,6 +299,7 @@ namespace Address_Book
             this.Controls.Add(this.txtboxLastName);
             this.Controls.Add(this.txtboxFirstName);
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.Name = "Form1";
             this.Text = "Address Entry";
@@ -322,6 +335,7 @@ namespace Address_Book
         private System.Windows.Forms.Label lblCurrentContacts;
         private System.Windows.Forms.Button btnAddNewEntry;
         private System.Windows.Forms.Button btnUpdateEntry;
+        private System.Windows.Forms.Button btnClearAddress;
     }
 }
 
