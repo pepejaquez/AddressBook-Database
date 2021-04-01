@@ -5,39 +5,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Address_Book
+namespace DataStructures.List
 {
-    class List
+    public class ArrayList
     {
-        // Capacity is used to initailize the myMemory array.
-        static int capacity = 5;
-        int[] myMemory = new int[capacity];
+        // Capacity is used to initailize the memory array.
+        private static int capacity = 5;
+        private int[] memory = new int[capacity];
 
-        // Tracks how may item are in the myMemory array.
-        int items = 0;
+        // Tracks how may item are in the memory array.
+        private int items = 0;
 
-        public List()
+        public ArrayList()
         {
-
         }
-
-        //static void Main()
-        //{
-
-        //    List tester = new List();
-
-        //    tester.Add(1);
-        //    tester.Add(2);
-        //    tester.Add(3);
-        //    tester.Add(4);
-        //    tester.Add(5);
-
-        //    tester.print();
-        //    Console.WriteLine();
-
-        //    tester.Insert(2, 3333);
-        //    tester.print();
-        //}
 
         /// <summary>
         /// The add method adds an item to the end of the array. If the array is full, the method will double the size of the array, copy the contents of the array to the tempMemory array, point the memory location to the newly sized array, and then adds the new item.
@@ -52,70 +33,50 @@ namespace Address_Book
             ResizeList();
 
             // Add the new item to the newly sized array.
-            myMemory[firstopen] = i;
+            memory[firstopen] = i;
 
             // Track the current number of items in the array.
             items++;
         }
 
-
         /// <summary>
         /// Print the contents of the list.
         /// </summary>
-        public void print()
+        public void Print()
         {
-            for(int i = 0; i < items; i++)
+            for (int i = 0; i < items; i++)
             {
                 {
-                    Console.WriteLine(myMemory[i]);
+                    Console.WriteLine(memory[i]);
                 }
             }
         }
 
-        private void ResizeList()
+        public int Length()
         {
-            if (items == capacity)
-            {
-                // Double the capacity for the array
-                capacity *= 2;
-
-                //Temp array to hold the contents of the old array.
-                int[] tempMemory = new int[capacity];
-
-                // Used to place the contents of the old array in the proper place in the newly sized array.
-                int trackIndex = 0;
-
-                foreach (int j in myMemory)
-                {
-                    tempMemory[trackIndex] = j;
-                    trackIndex++;
-                }
-
-                // Point the old array to the newly sized array.
-                myMemory = tempMemory;
-
-            }
+            return items;
         }
 
         /// <summary>
         /// Removes the first occurance of 'item'.
         /// </summary>
-        /// <param name="item"></param>
+        /// <param name="item">The item to remove.</param>
         public void Remove(int item)
-        {            
-            for(int i = 0; i < items; i++)
+        {
+            for (int i = 0; i < items; i++)
             {
                 // If the item is found, shift the remaining items to the left.
-                if(myMemory[i] == item)
+                if (memory[i] == item)
                 {
-                    for(int j = i; j < items - 1; j++)
+                    for (int j = i; j < items - 1; j++)
                     {
-                        myMemory[j] = myMemory[j + 1];
+                        memory[j] = memory[j + 1];
                     }
+
                     items--;
                     break;
                 }
-            }            
+            }
         }
 
         /// <summary>
@@ -124,9 +85,8 @@ namespace Address_Book
         /// <param name="index">An integer that corresponds to the index.</param>
         public void RemoveAt(int index)
         {
-            myMemory[index] = 0;
+            memory[index] = 0;
         }
-
 
         /// <summary>
         /// Insert a new item at the specified index.
@@ -140,12 +100,53 @@ namespace Address_Book
             {
                 // If the insertion index = 0  AND i = 0 bypass the for loop and insert the item.
                 if (!(i == 0 && index == 0))
-                    myMemory[i] = myMemory[i - 1];
+                {
+                    memory[i] = memory[i - 1];
+                }
             }
-            myMemory[index] = item;
+
+            memory[index] = item;
             items++;
         }
 
+        public int IndexOf(int item)
+        {
+            int index = 0;
+            foreach (int i in memory)
+            {
+                if (i == item)
+                {
+                    return index;
+                }
 
+                index++;
+            }
+
+            return -1;
+        }
+
+        private void ResizeList()
+        {
+            if (items == capacity)
+            {
+                // Double the capacity for the array
+                capacity *= 2;
+
+                // Temp array to hold the contents of the old array.
+                int[] tempMemory = new int[capacity];
+
+                // Used to place the contents of the old array in the proper place in the newly sized array.
+                int trackIndex = 0;
+
+                foreach (int j in memory)
+                {
+                    tempMemory[trackIndex] = j;
+                    trackIndex++;
+                }
+
+                // Point the old array to the newly sized array.
+                memory = tempMemory;
+            }
+        }
     }
 }
